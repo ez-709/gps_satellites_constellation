@@ -14,6 +14,5 @@ This project is ideal for educational purposes, space enthusiasts, and developer
 
 ### Result Visualization
 
-<img width="1437" height="1419" alt="изображение" src="https://github.com/user-attachments/assets/15f4f08a-bd0e-41fd-bcbb-cc3ddb62514f" /|400>
-
+<img width="400" alt="GPS Constellation Visualization" src="https://github.com/user-attachments/assets/15f4f08a-bd0e-41fd-bcbb-cc3ddb62514f"/>
 
