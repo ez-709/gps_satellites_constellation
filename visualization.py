@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import datetime
 
-from utils import unix_to_utc
+from utils import unix_to_utc, proections_from_coordinates
 
 def vizualize_orbits(orbit_data, time_agp, observer_longitude=None, observer_latitude=None, observer_altitude=None):
     
@@ -32,19 +32,14 @@ def vizualize_orbits(orbit_data, time_agp, observer_longitude=None, observer_lat
 
     lon_g = 0 
     lat_g = np.linspace(-np.pi/2, np.pi/2, 100)
-    x_g = R_earth * np.cos(lat_g) * np.cos(lon_g)
-    y_g = R_earth * np.cos(lat_g) * np.sin(lon_g)
-    z_g = R_earth * np.sin(lat_g)
+    x_g, y_g, z_g = proections_from_coordinates(lat_g, lon_g, 0)
     ax.plot(x_g, y_g, z_g, color='black', linewidth=1.5, linestyle='--', label='Prime Meridian')
 
     if observer_longitude is not None and observer_latitude is not None:
         lon_rad = np.radians(observer_longitude)
         lat_rad = np.radians(observer_latitude)
         alt = observer_altitude if observer_altitude is not None else 0
-        r_obs = R_earth + alt
-        x_obs = r_obs * np.cos(lat_rad) * np.cos(lon_rad)
-        y_obs = r_obs * np.cos(lat_rad) * np.sin(lon_rad)
-        z_obs = r_obs * np.sin(lat_rad)
+        x_obs, y_obs, z_obs = proections_from_coordinates(lat_rad, lon_rad, alt)
         ax.scatter([x_obs], [y_obs], [z_obs], color='red', s=50, label='Observer')
 
     for idx, orbit in enumerate(orbit_data):

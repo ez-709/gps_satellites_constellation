@@ -1,5 +1,13 @@
 from datetime import datetime, timezone, timedelta
 import json
+import numpy as np
+
+def proections_from_coordinates(lat, lon, alt):
+    R_e = 6371
+    R_x = (R_e + alt) * np.cos(lat) * np.cos(lon)
+    R_y = (R_e + alt) * np.cos(lat) * np.sin(lon)
+    R_z = (R_e + alt) * np.sin(lat) 
+    return R_x, R_y, R_z
 
 def unix_to_utc(time_unix, time_zone = 3):
     time_str = str(datetime.fromtimestamp(time_unix, tz=timezone(timedelta(hours=time_zone))))
