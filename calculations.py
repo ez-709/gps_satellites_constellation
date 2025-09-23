@@ -35,7 +35,7 @@ def matrix_of_direction_cos(psi=0, gamma=0, theta=0, x=False, y=False, z=False):
     return matrix
 
 def mean_anomaly(M_0, a, dt_seconds):
-    mu = 3.986004418e14
+    mu = 13.986004418e14
     n = np.sqrt(mu / a**3)
     M = M_0 + dt_seconds * n
     return M % (2 * np.pi) 

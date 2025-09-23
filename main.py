@@ -28,6 +28,7 @@ if __name__ == "__main__":
             step_seconds=step_seconds
         )
 
+        time_agp = sat['unix_time']
         x_coords = []
         y_coords = []
         z_coords = []
@@ -44,5 +45,6 @@ if __name__ == "__main__":
             'z': z_coords
         })
     
-    vizualize_orbits(all_orbits, observer_altitude = observer_altitude, 
+    vizualize_orbits(all_orbits, time_agp, observer_altitude = observer_altitude, 
                      observer_latitude=observer_latitude, observer_longitude=observer_longitude)
+    

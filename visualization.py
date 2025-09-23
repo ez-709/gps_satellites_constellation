@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import time
+import datetime
 
 from utils import unix_to_utc
 
-def vizualize_orbits(orbit_data, observer_longitude=None, observer_latitude=None, observer_altitude=None):
+def vizualize_orbits(orbit_data, time_agp, observer_longitude=None, observer_latitude=None, observer_altitude=None):
     
     colors = [
         "#D40A0A", "#E25C04", "#F1B501", "#C1B202", "#6E9E03",
@@ -66,7 +66,7 @@ def vizualize_orbits(orbit_data, observer_longitude=None, observer_latitude=None
     ax.set_xlabel('X (km)')
     ax.set_ylabel('Y (km)')  
     ax.set_zlabel('Z (km)')
-    ax.set_title(f'Satellite GPS Orbits at {unix_to_utc(time.time())}')
+    ax.set_title(f'Satellite GPS Orbits at {datetime.datetime.utcfromtimestamp(time_agp)}')
 
     max_coord = R_earth * 1.1
     for orbit in orbit_data:
