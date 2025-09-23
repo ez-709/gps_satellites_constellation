@@ -2,7 +2,7 @@ import os
 
 from utils import read_config
 from calculations import calculate_ISK_coordinates
-from visualization import vizualize_orbits
+from visualization import vizualize_orbits_3d
 from parser import parse_orbit_file
 
 cd = os.getcwd()
@@ -20,9 +20,9 @@ if __name__ == "__main__":
             a=sat['a'],  
             e=sat['e'],
             M_0=sat['M_0'],
-            omega=sat['omega'],
+            w=sat['w'],
             i=sat['i'],
-            Omega=sat['Omega'],
+            omega=sat['omega'],
             time_agp_start=sat['unix_time'],
             end_time_hours=12,
             step_seconds=step_seconds
@@ -45,6 +45,6 @@ if __name__ == "__main__":
             'z': z_coords
         })
     
-    vizualize_orbits(all_orbits, time_agp, observer_altitude = observer_altitude, 
+    vizualize_orbits_3d(all_orbits, time_agp, observer_altitude = observer_altitude, 
                      observer_latitude=observer_latitude, observer_longitude=observer_longitude)
     

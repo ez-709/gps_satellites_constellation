@@ -2,9 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import datetime
 
+
 from utils import unix_to_utc, proections_from_coordinates
 
-def vizualize_orbits(orbit_data, time_agp, observer_longitude=None, observer_latitude=None, observer_altitude=None):
+def vizualize_orbits_3d(orbit_data, time_agp, observer_longitude=None, observer_latitude=None, observer_altitude=None):
     
     colors = [
         "#D40A0A", "#E25C04", "#F1B501", "#C1B202", "#6E9E03",

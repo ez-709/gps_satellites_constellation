@@ -35,18 +35,18 @@ def parse_orbit_file(filename):
             i += 3
             continue
 
-        Omega = params3[0]      
+        omega = params3[0]      
         i_orbit = params3[1]    
-        omega = params3[2]     
+        w = params3[2]     
         e = params3[3]         
         sqrt_a = params3[4]    
         M_0 = params3[5]      
         
         a = sqrt_a * sqrt_a
         
-        Omega_rad = Omega * np.pi
-        i_rad = i_orbit * np.pi
         omega_rad = omega * np.pi
+        i_rad = i_orbit * np.pi
+        w_rad = w * np.pi
         M_0_rad = M_0 * np.pi
         
         unix_time = date_to_unix(day_recv, month_recv, year_recv, seconds_from_year_start)
@@ -56,9 +56,9 @@ def parse_orbit_file(filename):
             'a': a,               
             'e': e,                
             'M_0': M_0_rad,         
-            'omega': omega_rad,    
+            'w': w_rad,    
             'i': i_rad,         
-            'Omega': Omega_rad   
+            'omega': omega_rad   
         }
         
         result.append(data)
