@@ -27,13 +27,13 @@ def true_anomaly(e, E):
 def calculate_r(a, e, E):
     return a * (1 - e * np.cos(E))
 
-def calculate_r_ISK(r, v, w, i, omega):
-    x = r * (np.cos(v) * np.cos(omega) - np.sin(v) * np.sin(omega) * np.cos(i))
-    y = r * (np.cos(v) * np.sin(omega) + np.sin(v) * np.cos(omega) * np.cos(i))
+def calculate_r_ISK(r, v, i, w, omega):
+    x = r * (np.cos(v) * np.cos(omega) - np.sin(v) * np.cos(i) * np.sin(omega))
+    y = r * (np.cos(v) * np.sin(omega) - np.sin(v) * np.cos(i) * np.cos(omega))
     z = r * (np.sin(v) * np.sin(i))
     return np.array([[x], [y], [z]])
         
-def calculate_ISK_coordinates(a, e, M_0,w, i, omega, time_agp_start, end_time_hours, step_seconds=600):
+def calculate_ISK_coordinates(a, e, M_0, i, w, omega, time_agp_start, end_time_hours, step_seconds=600):
     samples, step_seconds = calculate_samples_from_hours(end_time_hours, step_seconds)
     total_time_seconds = end_time_hours * 3600
     times = np.linspace(time_agp_start, time_agp_start + total_time_seconds, samples) 
@@ -45,6 +45,9 @@ def calculate_ISK_coordinates(a, e, M_0,w, i, omega, time_agp_start, end_time_ho
         E = kepler_equation(M, e) 
         v = true_anomaly(e, E)  
         r = calculate_r(a, e, E)
-        r_isk = calculate_r_ISK(r, v, w, i, omega)
+        r_isk = calculate_r_ISK(r, v, i, w, omega)
         r_isk_vectors.append({'r_isk': r_isk, 'time_point': time})
     return r_isk_vectors
+
+def from_ECI_to_DGCS(r_ECI):
+    matrix = 

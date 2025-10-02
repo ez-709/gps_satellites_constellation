@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 def parse_orbit_file(filename):    
     def line_to_floats(line):
         parts = line.strip().split()
-        return [float(part.replace('E+', 'E').replace('E-', 'E-')) for part in parts]
+        return [float(part.replace('E+', 'E')) for part in parts]
     
     def date_to_unix(day, month, year, seconds_from_year_start):
         dt = datetime(year, month, day, tzinfo=timezone.utc)

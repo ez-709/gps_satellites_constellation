@@ -20,8 +20,8 @@ if __name__ == "__main__":
             a=sat['a'],  
             e=sat['e'],
             M_0=sat['M_0'],
-            w=sat['w'],
             i=sat['i'],
+            w = sat['w'],
             omega=sat['omega'],
             time_agp_start=sat['unix_time'],
             end_time_hours=12,
@@ -47,4 +47,3 @@ if __name__ == "__main__":
     
     vizualize_orbits_3d(all_orbits, time_agp, observer_altitude = observer_altitude, 
                      observer_latitude=observer_latitude, observer_longitude=observer_longitude)
-    
