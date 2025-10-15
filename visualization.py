@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import datetime
 
-
 from utils import unix_to_utc, proections_from_coordinates
+from calculations import count_sats_in_the_sky
 
 def vizualize_orbits_3d(orbit_data, time_agp, observer_longitude=None, observer_latitude=None, observer_altitude=None):
     
@@ -77,5 +77,24 @@ def vizualize_orbits_3d(orbit_data, time_agp, observer_longitude=None, observer_
     
     plt.tight_layout()
     plt.legend()
-    plt.show()
+    return fig, ax
+
+def plot_visible_satellites(sats_in_the_sky_by_time, start_time_unix=None):
+    times_unix = np.array([item['time'] for item in sats_in_the_sky_by_time])
+    counts = [item['visible_count'] for item in sats_in_the_sky_by_time]
+
+    if start_time_unix is None:
+        start_time_unix = times_unix[0]
+
+    times_hours = (times_unix - start_time_unix) / 3600.0
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(times_hours, counts)
+    ax.set_xlabel('Время, ч')
+    ax.set_ylabel('Количество видимых спутников')
+    ax.set_title('Количество видимых спутников во времени')
+    ax.grid(True)
+    ax.set_xlim(left=0)
+    ax.set_xticks(np.arange(0, max(times_hours) + 1, 1))
+
     return fig, ax
