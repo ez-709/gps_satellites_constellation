@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utils import read_config
-from calculations import calculate_ECI_coordinates, from_ECI_to_DGCS, count_sats_in_the_sky, geodetic_to_DGCS
+from calculations import calculate_ECI_coordinates, from_ECI_to_DGCS, count_sats_in_the_sky, geodetic_to_DGCS, calculate_EL_AZ
 from visualization import vizualize_orbits_3d, plot_visible_satellites
 from parser import parse_orbit_file
 
@@ -53,10 +53,10 @@ if __name__ == "__main__":
     fig1, ax1 = vizualize_orbits_3d(all_orbits, time_agp, observer_altitude = observer_altitude, 
                      observer_latitude=observer_latitude, observer_longitude=observer_longitude)
     
-    all_sats_DGSK = []
     r_o_dgsk = geodetic_to_DGCS(np.radians(observer_latitude), np.radians(observer_longitude), observer_altitude)
-    all_sats_DGSK = []
-    for ECI_data in all_sats_ECI:
+    all_sats_DGSK = {}
+    all_sats_angels = {}
+    for num, ECI_data in enumerate(all_sats_ECI):
         dgsk_coords = from_ECI_to_DGCS(ECI_data) 
         sat_dgsk = []
         for i in range(len(dgsk_coords)):
@@ -64,9 +64,12 @@ if __name__ == "__main__":
                 'r_s_dgsk': dgsk_coords[i],
                 'time_point': ECI_data[i]['time_point']
             })
-        all_sats_DGSK.append(sat_dgsk)
 
-    sats_in_the_sky_by_time = count_sats_in_the_sky(all_sats_DGSK, r_o_dgsk, gamma_max)
+        all_sats_DGSK[f'sat {num}'] = sat_dgsk
+        all_sats_angels[f'sat {num}'] = calculate_EL_AZ(sat_dgsk, r_o_dgsk) 
+
+    gamma_max_rad = np.radians(gamma_max)
+    sats_in_the_sky_by_time = count_sats_in_the_sky(all_sats_angels, gamma_max_rad)
     fig2, ax2 = plot_visible_satellites(sats_in_the_sky_by_time, sats_coords[0]['unix_time'])
 
     plt.show()

@@ -120,8 +120,8 @@ def calculate_EL_AZ(DGSK_dicts, r_o_dgsk):
         r_dif = np.array([x_s - x_o, y_s - y_o, z_s - z_o])
 
         if R_g == 0:
-            res_dict.append({'el': "Углы не могут быть определены R_g = 0", 
-                             'az' : "Углы не могут быть определены R_g = 0", 
+            res_dict.append({'el': None, 
+                             'az' : +None, 
                              'time' : time})
             continue
 
@@ -144,23 +144,21 @@ def calculate_EL_AZ(DGSK_dicts, r_o_dgsk):
 
     return res_dict
 
-def count_sats_in_the_sky(satellites_dgsk_list, r_o_dgsk, gamma_mask_deg):
-    gamma_mask_rad = np.deg2rad(gamma_mask_deg)
+def count_sats_in_the_sky(all_sats_angels, gamma_mask_rad):
+    first_sat = list(all_sats_angels.values())[0]
     result = []
 
-    for i in range(len(satellites_dgsk_list[0])):
-        time = satellites_dgsk_list[0][i]['time_point']
-        visible_count = 0
+    for i in range(len(first_sat)):
+        time = first_sat[i]['time']
+        count = 0
 
-        for sat in satellites_dgsk_list:
-            el_az_list = calculate_EL_AZ([sat[i]], r_o_dgsk)
-            el = el_az_list[0]['el']
-            if isinstance(el, (int, float, np.number)) and not np.isnan(el):
-                if el > gamma_mask_rad:
-                    visible_count += 1
+        for sat_name in all_sats_angels:
+            el = all_sats_angels[sat_name][i]['el']
 
-        result.append({'time': time, 'visible_count': visible_count})
+            if el:
+                if not np.isnan(el) and el >= gamma_mask_rad:
+                    count += 1
+
+        result.append({'time': time, 'visible_count': count})
 
     return result
-
-

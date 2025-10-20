@@ -90,9 +90,8 @@ def plot_visible_satellites(sats_in_the_sky_by_time, start_time_unix=None):
 
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.plot(times_hours, counts)
-    ax.set_xlabel('Время, ч')
-    ax.set_ylabel('Количество видимых спутников')
-    ax.set_title('Количество видимых спутников во времени')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Visivle sattellites')
     ax.grid(True)
     ax.set_xlim(left=0)
     ax.set_xticks(np.arange(0, max(times_hours) + 1, 1))
