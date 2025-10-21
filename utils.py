@@ -44,7 +44,7 @@ def read_config(cd_config, observer_longitude=True, observer_latitude=True,
     if step_seconds == True:
         out.append(config.get('step seconds'))
     if gamma_max == True:
-        out.append(gamma_max)
+        out.append(config.get('gamma_max'))
     if noise_level == True:
         out.append(config.get('noise level'))
     return out

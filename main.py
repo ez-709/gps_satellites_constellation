@@ -68,8 +68,7 @@ if __name__ == "__main__":
         all_sats_DGSK[f'sat {num}'] = sat_dgsk
         all_sats_angels[f'sat {num}'] = calculate_EL_AZ(sat_dgsk, r_o_dgsk) 
         
-    gamma_max_rad = np.radians(gamma_max)
-    sats_in_the_sky_by_time, all_sats_DGSK_vis = count_sats_in_the_sky(all_sats_angels, all_sats_DGSK, gamma_max_rad)
+    sats_in_the_sky_by_time, all_sats_DGSK_vis = count_sats_in_the_sky(all_sats_angels, all_sats_DGSK, gamma_max)
     psevdo_r_dict = psevdo_r(all_sats_DGSK_vis, r_o_dgsk, noise_level)
     fig2, ax2 = plot_visible_satellites(sats_in_the_sky_by_time, sats_coords[0]['unix_time'])
 

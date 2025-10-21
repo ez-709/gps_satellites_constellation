@@ -144,7 +144,7 @@ def calculate_EL_AZ(DGSK_dicts, r_o_dgsk):
 
     return res_dict
 
-def count_sats_in_the_sky(all_sats_angels, r_dgsk_dict, gamma_mask_rad):
+def count_sats_in_the_sky(all_sats_angels, r_dgsk_dict, gamma_mask):
     first_sat = next(iter(all_sats_angels), None)
 
     num_time_steps = len(all_sats_angels[first_sat])
@@ -158,7 +158,7 @@ def count_sats_in_the_sky(all_sats_angels, r_dgsk_dict, gamma_mask_rad):
             el = all_sats_angels[sat_name][i]['el']
             r_dgsk_entry = r_dgsk_dict[sat_name][i]
 
-            if el >= gamma_mask_rad:
+            if el >= np.radians(gamma_mask):
                 count += 1
             else:
                 r_dgsk_entry['r_s_dgsk'] = None
