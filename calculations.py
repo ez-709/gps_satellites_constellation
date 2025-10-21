@@ -144,24 +144,28 @@ def calculate_EL_AZ(DGSK_dicts, r_o_dgsk):
 
     return res_dict
 
-def count_sats_in_the_sky(all_sats_angels, gamma_mask_rad):
-    first_sat = list(all_sats_angels.values())[0]
+def count_sats_in_the_sky(all_sats_angels, r_dgsk_dict, gamma_mask_rad):
+    first_sat = next(iter(all_sats_angels), None)
+
+    num_time_steps = len(all_sats_angels[first_sat])
     result = []
 
-    for i in range(len(first_sat)):
-        time = first_sat[i]['time']
+    for i in range(num_time_steps):
+        time = all_sats_angels[first_sat][i]['time']
         count = 0
 
         for sat_name in all_sats_angels:
             el = all_sats_angels[sat_name][i]['el']
+            r_dgsk_entry = r_dgsk_dict[sat_name][i]
 
-            if el:
-                if not np.isnan(el) and el >= gamma_mask_rad:
-                    count += 1
+            if el >= gamma_mask_rad:
+                count += 1
+            else:
+                r_dgsk_entry['r_s_dgsk'] = None
 
         result.append({'time': time, 'visible_count': count})
 
-    return result
+    return result, r_dgsk_dict
 
 '''
 def calculate_ionospheric_delay(el, az, phi_o, lamda_o, alpha, beta, true_distance):
@@ -190,6 +194,7 @@ def calculate_ionospheric_delay(el, az, phi_o, lamda_o, alpha, beta, true_distan
     F = 1 + 16 * (0.53 - el)^3
 '''
 
+
 def psevdo_r(r_dgsk_dict, r_o_dgsk, noise_level=3.0):
     r_o = np.array(r_o_dgsk)
     psevdo_r_dict = {}
@@ -197,12 +202,16 @@ def psevdo_r(r_dgsk_dict, r_o_dgsk, noise_level=3.0):
     for sat_name, sat_list in r_dgsk_dict.items():
         pseudorange_list = []
         for entry in sat_list:
-            r_s = np.array(entry['r_s_dgsk'])
+            r_s_raw = entry['r_s_dgsk']
             time_point = entry['time_point']
 
-            true_range = np.linalg.norm(r_s - r_o)
-            noise = np.random.uniform(-noise_level, noise_level)
-            pseudorange = true_range + 1.5 + noise
+            if r_s_raw is None:
+                pseudorange = None
+            else:
+                r_s = np.array(r_s_raw)
+                true_range = np.linalg.norm(r_s - r_o)
+                noise = np.random.uniform(-noise_level, noise_level)
+                pseudorange = true_range + 1.5 + noise
 
             pseudorange_list.append({
                 'psevdo r': pseudorange,
@@ -212,3 +221,4 @@ def psevdo_r(r_dgsk_dict, r_o_dgsk, noise_level=3.0):
         psevdo_r_dict[sat_name] = pseudorange_list
 
     return psevdo_r_dict
+

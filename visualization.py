@@ -101,20 +101,56 @@ def plot_visible_satellites(sats_in_the_sky_by_time, start_time_unix=None):
 
 def plot_psevdo_r(psevdo_r_dict):
     sat_names = [f'sat {i}' for i in range(5)]
+    colors = [
+        "#D40A0A", "#E25C04", "#F1B501", "#C1B202", "#6E9E03",
+        "#007034", "#055F54", "#0A4E75", "#2800BA", "#5A00B0",
+        "#8C00A5", "#A23B72", "#896284", "#6F8996", "#00DCBF",
+        "#00BFB3", "#00A2A6", "#008599", "#00688C", "#004B7F",
+        "#002E72", "#000000", "#201203", "#402406", "#603609",
+        "#803A0F", "#864A1C", "#8C5A29", "#926A36", "#987A43",
+        "#9E8A50", "#A49A5D"
+    ]
+    color_dict = {sat_name: color for sat_name, color in zip(sat_names, colors)}
 
     start_time_unix = psevdo_r_dict['sat 0'][0]['time_point']
 
     fig, ax = plt.subplots(figsize=(12, 6))
 
     for sat_name in sat_names:
-        if sat_name not in psevdo_r_dict:
-            continue  
         data = psevdo_r_dict[sat_name]
         times = np.array([entry['time_point'] for entry in data])
-        prs_km = np.array([entry['psevdo r'] for entry in data]) / 1000.0 
-        times_rel = (times - start_time_unix) / 3600.0 
+        prs_raw = [entry['psevdo r'] for entry in data]
+        
+        segments = []
+        current_segment_times = []
+        current_segment_prs = []
+        
+        for i, pr in enumerate(prs_raw):
+            if pr is not None:
+                current_segment_times.append(times[i])
+                current_segment_prs.append(pr)
+            else:
+                if current_segment_prs:
+                    segments.append({
+                        'times': current_segment_times,
+                        'prs': current_segment_prs
+                    })
+                    current_segment_times = []
+                    current_segment_prs = []
 
-        ax.plot(times_rel, prs_km, label=sat_name)
+        if current_segment_prs:
+            segments.append({
+                'times': current_segment_times,
+                'prs': current_segment_prs
+            })
+        
+        color = color_dict[sat_name]
+        for j, segment in enumerate(segments):
+            times_rel = (np.array(segment['times']) - start_time_unix) / 3600.0
+            prs_km = np.array(segment['prs']) / 1000.0
+
+            label = sat_name if j == 0 else ""
+            ax.plot(times_rel, prs_km, color=color, label=label, linewidth=1.5)
 
     ax.set_xlabel('Time [hours from start]')
     ax.set_ylabel('Pseudorange [km]')
