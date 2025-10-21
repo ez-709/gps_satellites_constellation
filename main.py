@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utils import read_config
-from calculations import calculate_ECI_coordinates, from_ECI_to_DGCS, count_sats_in_the_sky, geodetic_to_DGCS, calculate_EL_AZ
-from visualization import vizualize_orbits_3d, plot_visible_satellites
+from calculations import calculate_ECI_coordinates, from_ECI_to_DGCS, count_sats_in_the_sky, geodetic_to_DGCS, calculate_EL_AZ, psevdo_r
+from visualization import vizualize_orbits_3d, plot_visible_satellites, plot_psevdo_r
 from parser import parse_orbit_file
 
 cd = os.getcwd()
@@ -12,7 +12,7 @@ cd_agp = os.path.join(cd, 'data', '2025', 'mcct_250908.agp')
 
 if __name__ == "__main__":
     config_path = os.path.join(os.path.dirname(__file__), 'config.json')
-    observer_longitude, observer_latitude, observer_altitude, step_seconds, gamma_max = read_config(config_path)
+    observer_longitude, observer_latitude, observer_altitude, step_seconds, gamma_max, noise_level = read_config(config_path)
 
     sats_coords = parse_orbit_file(cd_agp)
     all_orbits = []
@@ -67,9 +67,12 @@ if __name__ == "__main__":
 
         all_sats_DGSK[f'sat {num}'] = sat_dgsk
         all_sats_angels[f'sat {num}'] = calculate_EL_AZ(sat_dgsk, r_o_dgsk) 
-
+        
+    psevdo_r_dict = psevdo_r(all_sats_DGSK, r_o_dgsk, noise_level)
     gamma_max_rad = np.radians(gamma_max)
     sats_in_the_sky_by_time = count_sats_in_the_sky(all_sats_angels, gamma_max_rad)
     fig2, ax2 = plot_visible_satellites(sats_in_the_sky_by_time, sats_coords[0]['unix_time'])
+
+    fig3, ax3 = plot_psevdo_r(psevdo_r_dict)
 
     plt.show()

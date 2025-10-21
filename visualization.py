@@ -92,8 +92,35 @@ def plot_visible_satellites(sats_in_the_sky_by_time, start_time_unix=None):
     ax.plot(times_hours, counts)
     ax.set_xlabel('Time')
     ax.set_ylabel('Visivle sattellites')
+    ax.set_title('Number of satellites in the sky by time')
     ax.grid(True)
     ax.set_xlim(left=0)
     ax.set_xticks(np.arange(0, max(times_hours) + 1, 1))
+
+    return fig, ax
+
+def plot_psevdo_r(psevdo_r_dict):
+    sat_names = [f'sat {i}' for i in range(5)]
+
+    start_time_unix = psevdo_r_dict['sat 0'][0]['time_point']
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    for sat_name in sat_names:
+        if sat_name not in psevdo_r_dict:
+            continue  
+        data = psevdo_r_dict[sat_name]
+        times = np.array([entry['time_point'] for entry in data])
+        prs_km = np.array([entry['psevdo r'] for entry in data]) / 1000.0 
+        times_rel = (times - start_time_unix) / 3600.0 
+
+        ax.plot(times_rel, prs_km, label=sat_name)
+
+    ax.set_xlabel('Time [hours from start]')
+    ax.set_ylabel('Pseudorange [km]')
+    ax.set_title('Pseudoranges')
+    ax.grid(True)
+    ax.legend()
+    ax.set_xlim(left=0)
 
     return fig, ax

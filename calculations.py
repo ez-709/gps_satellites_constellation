@@ -162,3 +162,53 @@ def count_sats_in_the_sky(all_sats_angels, gamma_mask_rad):
         result.append({'time': time, 'visible_count': count})
 
     return result
+
+'''
+def calculate_ionospheric_delay(el, az, phi_o, lamda_o, alpha, beta, true_distance):
+    if el <= 0:
+        return 0.0
+
+    Az = az / np.pi
+    El = el / np.pi
+    phi_o = phi_o / np.pi
+    lamda_o = lamda_o / np.pi
+
+    phi = 0.0137 * El + 0.11
+
+    phi_i = phi_o + phi * np.cos(Az * np.pi)
+
+    if phi_i > 0.416:
+        phi_i = 0.416
+    elif phi_i < -0.416:
+        phi_i = -0.416
+
+    lamda_i = lamda_o + np.sin(az * np.pi)/np.cos(phi_i * np.pi)
+    phi_m = phi_i + 0.064 * np.cos((lamda_i - 1.617) * np.pi)
+    T_em = true_distance / 299792458.0 
+    T = 4.32 * 1e4 * lamda_i + T_em
+
+    F = 1 + 16 * (0.53 - el)^3
+'''
+
+def psevdo_r(r_dgsk_dict, r_o_dgsk, noise_level=3.0):
+    r_o = np.array(r_o_dgsk)
+    psevdo_r_dict = {}
+
+    for sat_name, sat_list in r_dgsk_dict.items():
+        pseudorange_list = []
+        for entry in sat_list:
+            r_s = np.array(entry['r_s_dgsk'])
+            time_point = entry['time_point']
+
+            true_range = np.linalg.norm(r_s - r_o)
+            noise = np.random.uniform(-noise_level, noise_level)
+            pseudorange = true_range + 1.5 + noise
+
+            pseudorange_list.append({
+                'psevdo r': pseudorange,
+                'time_point': time_point
+            })
+
+        psevdo_r_dict[sat_name] = pseudorange_list
+
+    return psevdo_r_dict
