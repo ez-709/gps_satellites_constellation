@@ -1,8 +1,4 @@
-Вот обновлённое описание с **единым, средним размером изображений** (ширина `600px` — достаточно для читаемости, но не занимает всю ширину экрана):
-
----
-
-### Project Description
+### Project Description
 
 **GPS Satellites Constellation** is a visualization and simulation project that demonstrates the orbital mechanics and positioning of satellites in the Global Positioning System (GPS) constellation. The project aims to provide an intuitive understanding of how GPS satellites orbit the Earth, their distribution in space, and how they enable accurate positioning and navigation on the planet's surface.
 
