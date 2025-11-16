@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import datetime
 
 from utils import unix_to_utc, proections_from_coordinates
-from calculations import count_sats_in_the_sky
 
 def vizualize_orbits_3d(orbit_data, time_agp, observer_longitude=None, observer_latitude=None, observer_altitude=None):
     
@@ -159,4 +158,17 @@ def plot_psevdo_r(psevdo_r_dict):
     ax.legend()
     ax.set_xlim(left=0)
 
+    return fig, ax
+
+def plot_coors_error(errors_X, errors_Y, errors_Z, end_time):
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(end_time, errors_X, label='Ошибка по X', linewidth=1.2)
+    ax.plot(end_time, errors_Y, label='Ошибка по Y', linewidth=1.2)
+    ax.plot(end_time, errors_Z, label='Ошибка по Z', linewidth=1.2)
+    ax.set_xlabel('Время, часы')
+    ax.set_ylabel('Погрешность, метры')
+    ax.set_title('Погрешность навигационного решения (МНК) — ЛР №3')
+    ax.grid(True)
+    ax.legend()
+    ax.set_xlim(0, 3)
     return fig, ax

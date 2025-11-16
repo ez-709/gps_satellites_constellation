@@ -2,9 +2,11 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 from utils import read_config
-from calculations import calculate_ECI_coordinates, from_ECI_to_DGCS, count_sats_in_the_sky, geodetic_to_DGCS, calculate_EL_AZ, psevdo_r
-from visualization import vizualize_orbits_3d, plot_visible_satellites, plot_psevdo_r
+from calculations import (calculate_ECI_coordinates, from_ECI_to_DGCS, count_sats_in_the_sky, geodetic_to_DGCS,
+                          calculate_EL_AZ, psevdo_r, calculate_possiotion_errors_for_end_time_hours)
+from visualization import vizualize_orbits_3d, plot_visible_satellites, plot_psevdo_r, plot_coors_error
 from parser import parse_orbit_file
 
 cd = os.getcwd()
@@ -68,10 +70,14 @@ if __name__ == "__main__":
         all_sats_DGSK[f'sat {num}'] = sat_dgsk
         all_sats_angels[f'sat {num}'] = calculate_EL_AZ(sat_dgsk, r_o_dgsk) 
         
-    sats_in_the_sky_by_time, all_sats_DGSK_vis = count_sats_in_the_sky(all_sats_angels, all_sats_DGSK, gamma_max)
-    psevdo_r_dict = psevdo_r(all_sats_DGSK_vis, r_o_dgsk, noise_level)
+    sats_in_the_sky_by_time, all_sats_DGSK = count_sats_in_the_sky(all_sats_angels, all_sats_DGSK, gamma_max)
+    psevdo_r_dict = psevdo_r(all_sats_DGSK, r_o_dgsk, noise_level)
     fig2, ax2 = plot_visible_satellites(sats_in_the_sky_by_time, sats_coords[0]['unix_time'])
 
     fig3, ax3 = plot_psevdo_r(psevdo_r_dict)
 
-    plt.show() 
+    errors_X, errors_Y, errors_Z, time_hours = calculate_possiotion_errors_for_end_time_hours(all_sats_DGSK, psevdo_r_dict, r_o_dgsk, time_agp, 20, 3)
+
+    fig4, ax4 = plot_coors_error(errors_X, errors_Y, errors_Z, time_hours)
+
+    plt.show()

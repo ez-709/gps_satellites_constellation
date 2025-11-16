@@ -211,7 +211,7 @@ def psevdo_r(r_dgsk_dict, r_o_dgsk, noise_level=3.0):
                 r_s = np.array(r_s_raw)
                 true_range = np.linalg.norm(r_s - r_o)
                 noise = np.random.uniform(-noise_level, noise_level)
-                pseudorange = true_range + 1.5 + noise
+                pseudorange = true_range + noise
 
             pseudorange_list.append({
                 'psevdo r': pseudorange,
@@ -222,3 +222,93 @@ def psevdo_r(r_dgsk_dict, r_o_dgsk, noise_level=3.0):
 
     return psevdo_r_dict
 
+def least_squares_position(visible_sat_coords, pseudoranges, max_iter=5, max_error=0.01):
+    r_est = np.array([[0.0], [0.0], [0.0]])
+
+    N = len(visible_sat_coords)
+    if N < 4:
+        raise ValueError("Для решения МНК необходимо минимум 4 видимых НКА.")
+
+    for _ in range(max_iter):
+        H = []  
+        z = [] 
+
+        for i in range(N):
+            r_sat = visible_sat_coords[i]  
+            rho_meas = pseudoranges[i]  
+
+            rho_calc = np.linalg.norm(r_sat - r_est)
+
+            z_i = rho_meas - rho_calc
+            z.append(z_i)
+
+            e_x = (r_sat[0, 0] - r_est[0, 0]) / rho_calc
+            e_y = (r_sat[1, 0] - r_est[1, 0]) / rho_calc
+            e_z = (r_sat[2, 0] - r_est[2, 0]) / rho_calc
+
+            H.append([e_x, e_y, e_z, 1.0])
+
+        H = np.array(H)            
+        z = np.array(z).reshape(-1, 1) 
+
+        x_ = np.linalg.inv(H.T @ H)@ (H.T @ z)  
+
+        delta_r = x_[:3].reshape(3, 1)
+        r_new = r_est + delta_r
+
+        if np.linalg.norm(delta_r) < max_error:
+            r_est = r_new
+            break
+
+        r_est = r_new
+
+    return r_est
+
+def calculate_possiotion_errors_for_end_time_hours(all_sats_DGSK, psevdo_r_dict, r_o_DGSK, time_agp, step, end_hours = 3):
+    start_time = time_agp
+    end_time = start_time + end_hours * 3600  
+    step_lr3 = 60                      
+    num_steps = int((end_time - start_time) / step_lr3)
+
+    errors_X = []
+    errors_Y = []
+    errors_Z = []
+    time_hours = []
+
+    for k in range(num_steps):
+        t_current = start_time + k * step_lr3
+
+        visible_sats = []
+        pseudoranges = []
+
+        for sat_name in all_sats_DGSK:
+            sat_list = all_sats_DGSK[sat_name]
+            pr_list = psevdo_r_dict[sat_name]
+
+            for i, entry in enumerate(sat_list):
+                if abs(entry['time_point'] - t_current) < step/ 2:
+                    r_s = entry['r_s_dgsk']
+                    rho = pr_list[i]['psevdo r']
+                    if r_s is not None and rho is not None:
+                        visible_sats.append(r_s)
+                        pseudoranges.append(rho)
+                    break
+
+        if len(visible_sats) < 4:
+            continue
+
+        try:
+            r_mnk = least_squares_position(visible_sats, pseudoranges)
+        except ValueError:
+            continue
+
+        err_x = abs(r_o_DGSK[0, 0] - r_mnk[0, 0])
+        err_y = abs(r_o_DGSK[1, 0] - r_mnk[1, 0])
+        err_z = abs(r_o_DGSK[2, 0] - r_mnk[2, 0])
+
+        errors_X.append(err_x)
+        errors_Y.append(err_y)
+        errors_Z.append(err_z)
+        time_hours.append(k * step_lr3 / 3600.0)
+
+    return errors_X, errors_Y, errors_Z, time_hours
