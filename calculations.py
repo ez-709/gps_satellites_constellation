@@ -222,49 +222,47 @@ def psevdo_r(r_dgsk_dict, r_o_dgsk, noise_level=2.0):
 
     return psevdo_r_dict
 
-def calculate_possition(time_point_data):
+def calculate_position(time_point_data):
     if len(time_point_data) < 4:
         return None
     
     satellite_list = list(time_point_data.values())
 
-    pos = np.array([0.0, 0.0, 0.0])
+    r_dgsk_pr_aprior = np.array([0, 0, 0])
 
-    for _ in range(100):
-        residuals = []
+    for _ in range(10):
+        z_rho = []
         H = []
 
         for sat_data in satellite_list:
-            pseudorange = sat_data['pseudo_r']
-            sat_coords_dgsk = np.array(sat_data['r_dgsk']).flatten()
+            rho_i = sat_data['pseudo_r']
 
-            dist_vec = sat_coords_dgsk - pos
-            dist = np.linalg.norm(dist_vec)
+            r_dgsk_sat_i = np.array(sat_data['r_dgsk']).flatten()
 
-            if dist < 1e-8:
+            rho_v = np.linalg.norm(r_dgsk_sat_i - r_dgsk_pr_aprior)
+
+            if rho_v < 1e-8:
                 continue
 
-            residuals.append(pseudorange - dist)
+            z_rho.append(rho_i - rho_v)
 
-            ex, ey, ez = dist_vec / dist
+            h_x, h_y, h_z = (r_dgsk_sat_i - r_dgsk_pr_aprior) / rho_v
 
-            H.append([ex, ey, ez, 1])
+            H.append([h_x, h_y, h_z, 1])
 
         H = np.array(H)
-        residuals = np.array(residuals)
+        z_rho = np.array(z_rho)
 
-        if len(residuals) < 4:
-            return None  
+        if len(z_rho) < 4:
+            return None
 
         try:
-            a1 = H.T @ H
-            a2 = np.linalg.inv(a1)
-            a3 = a2 @ H.T
-            delta = a3 @ residuals
+            x_est = np.linalg.inv(H.T @ H) @ H.T @ z_rho
 
-            pos = pos - delta[:3]
+            delta_r_est = x_est[:3]
+            r_dgsk_pr_aprior = r_dgsk_pr_aprior - delta_r_est
 
         except np.linalg.LinAlgError:
             return None
 
-    return pos.tolist()
+    return r_dgsk_pr_aprior.tolist()

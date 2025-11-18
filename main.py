@@ -5,7 +5,7 @@ import numpy as np
 
 from utils import read_config
 from calculations import (calculate_ECI_coordinates, from_ECI_to_DGCS, count_sats_in_the_sky, geodetic_to_DGCS,
-                          calculate_EL_AZ, psevdo_r, calculate_possition)
+                          calculate_EL_AZ, psevdo_r, calculate_position)
 from visualization import vizualize_orbits_3d, plot_visible_satellites, plot_psevdo_r, plot_coors_error
 from parser import parse_orbit_file
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     computed_positions = []
     for time_point in synthesized_data:
-        pos = calculate_possition(time_point)
+        pos = calculate_position(time_point)
         computed_positions.append(pos)
 
     true_position = r_o_dgsk.flatten()  
@@ -110,9 +110,9 @@ if __name__ == "__main__":
 
     for i, computed_pos in enumerate(computed_positions):
         if computed_pos is None:
-            errors_X.append(np.nan)
-            errors_Y.append(np.nan)
-            errors_Z.append(np.nan)
+            errors_X.append(None)
+            errors_Y.append(None)
+            errors_Z.append(None)
         else:
             computed = np.array(computed_pos)
             error_vec = computed - true_position
