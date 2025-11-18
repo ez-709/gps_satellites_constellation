@@ -230,7 +230,7 @@ def calculate_position(time_point_data):
 
     r_dgsk_pr_aprior = np.array([0, 0, 0])
 
-    for _ in range(10):
+    for _ in range(4):
         z_rho = []
         H = []
 
@@ -240,9 +240,6 @@ def calculate_position(time_point_data):
             r_dgsk_sat_i = np.array(sat_data['r_dgsk']).flatten()
 
             rho_v = np.linalg.norm(r_dgsk_sat_i - r_dgsk_pr_aprior)
-
-            if rho_v < 1e-8:
-                continue
 
             z_rho.append(rho_i - rho_v)
 
