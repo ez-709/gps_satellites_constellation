@@ -19,7 +19,7 @@ def vizualize_orbits_3d(orbit_data, time_agp, observer_longitude=None, observer_
     fig = plt.figure(figsize=(12, 10))
     ax = fig.add_subplot(111, projection='3d') 
 
-    R_earth = 6371  
+    R_earth = 6371 * 1e3 
     
     u = np.linspace(0, 2 * np.pi, 50)
     v = np.linspace(0, np.pi, 25)
@@ -162,12 +162,12 @@ def plot_psevdo_r(psevdo_r_dict):
 
 def plot_coors_error(errors_X, errors_Y, errors_Z, end_time):
     fig, ax = plt.subplots(figsize=(12, 6))
-    ax.plot(end_time, errors_X, label='Ошибка по X', linewidth=1.2)
-    ax.plot(end_time, errors_Y, label='Ошибка по Y', linewidth=1.2)
-    ax.plot(end_time, errors_Z, label='Ошибка по Z', linewidth=1.2)
-    ax.set_xlabel('Время, часы')
-    ax.set_ylabel('Погрешность, метры')
-    ax.set_title('Погрешность навигационного решения (МНК) — ЛР №3')
+    ax.plot(end_time, errors_X, label='Error X', linewidth=1.2)
+    ax.plot(end_time, errors_Y, label='Error Y', linewidth=1.2)
+    ax.plot(end_time, errors_Z, label='Error Z', linewidth=1.2)
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Errore (meters)')
+    ax.set_title('Error of navigation solution')
     ax.grid(True)
     ax.legend()
     ax.set_xlim(0, 3)

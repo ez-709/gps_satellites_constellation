@@ -5,7 +5,7 @@ import numpy as np
 
 from utils import read_config
 from calculations import (calculate_ECI_coordinates, from_ECI_to_DGCS, count_sats_in_the_sky, geodetic_to_DGCS,
-                          calculate_EL_AZ, psevdo_r, calculate_possiotion_errors_for_end_time_hours)
+                          calculate_EL_AZ, psevdo_r, calculate_possition)
 from visualization import vizualize_orbits_3d, plot_visible_satellites, plot_psevdo_r, plot_coors_error
 from parser import parse_orbit_file
 
@@ -40,9 +40,9 @@ if __name__ == "__main__":
         
         for point in orbit_data:
             r_isk = point['r_ECI']
-            x_coords.append(float(r_isk[0][0]) / 1000)
-            y_coords.append(float(r_isk[1][0]) / 1000)
-            z_coords.append(float(r_isk[2][0]) / 1000)
+            x_coords.append(float(r_isk[0][0]))
+            y_coords.append(float(r_isk[1][0]))
+            z_coords.append(float(r_isk[2][0]))
         
         all_sats_ECI.append(orbit_data)
             
@@ -76,7 +76,56 @@ if __name__ == "__main__":
 
     fig3, ax3 = plot_psevdo_r(psevdo_r_dict)
 
-    errors_X, errors_Y, errors_Z, time_hours = calculate_possiotion_errors_for_end_time_hours(all_sats_DGSK, psevdo_r_dict, r_o_dgsk, time_agp, 20, 3)
+    time_points_count = len(all_sats_DGSK['sat 0'])
+    synthesized_data = []
+
+    for i in range(time_points_count):
+        time_point_data = {}
+        
+        for num in range(len(all_sats_DGSK)):
+            sat_name = f'sat {num}'
+            sat_dgsk = all_sats_DGSK[sat_name]
+            pseudo_r_time_series = psevdo_r_dict[sat_name]
+
+            if sat_dgsk[i]['r_s_dgsk'] is not None and pseudo_r_time_series[i] is not None:
+                
+                time_point_data[sat_name] = {
+                    'pseudo_r': float(pseudo_r_time_series[i]['psevdo r']),
+                    'r_dgsk': sat_dgsk[i]['r_s_dgsk']
+                }
+        
+        synthesized_data.append(time_point_data)
+
+    computed_positions = []
+    for time_point in synthesized_data:
+        pos = calculate_possition(time_point)
+        computed_positions.append(pos)
+
+    true_position = r_o_dgsk.flatten()  
+
+    errors_X = []
+    errors_Y = []
+    errors_Z = []
+    time_hours = []
+
+    for i, computed_pos in enumerate(computed_positions):
+        if computed_pos is None:
+            errors_X.append(np.nan)
+            errors_Y.append(np.nan)
+            errors_Z.append(np.nan)
+        else:
+            computed = np.array(computed_pos)
+            error_vec = computed - true_position
+            errors_X.append(error_vec[0])
+            errors_Y.append(error_vec[1])
+            errors_Z.append(error_vec[2])
+        
+        time_hours.append(i * step_seconds / 3600.0)
+
+    errors_X = np.array(errors_X)
+    errors_Y = np.array(errors_Y)
+    errors_Z = np.array(errors_Z)
+    time_hours = np.array(time_hours)
 
     fig4, ax4 = plot_coors_error(errors_X, errors_Y, errors_Z, time_hours)
 

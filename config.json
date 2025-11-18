@@ -2,7 +2,7 @@
   "observer longitude": 37.6176,
   "observer latitude": 55.7558,
   "observer altitude": 0,
-  "step seconds": 600,
+  "step seconds": 60,
   "gamma_max" : 5,
   "noise level": 100
 }
